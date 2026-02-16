@@ -2070,7 +2070,39 @@ const uint8_t ep7_init_partial[] PROGMEM =
     0x03, 0x4e, 0x00, 0x00,
     0x03, 0x4f, 0x00, 0x00,
     0
-};  
+};
+
+// GDEM133T91 13.3" 960x680 B/W (SSD1677)
+const uint8_t ep133_init[] PROGMEM =
+{
+   1, SSD1608_SW_RESET,
+   BUSY_WAIT,
+   4, 0x01, 0xa7, 0x02, 0x00, // gate set: MUX = 679
+   2, 0x03, 0x00, // gate voltage control
+   4, 0x04, 0x41, 0xaa, 0x32, // set source voltage
+   2, 0x11, 0x03, // data entry mode: X inc, Y inc
+   2, 0x3c, 0x01, // border control
+   6, 0x0c, 0xae, 0xc7, 0xc3, 0xc0, 0x80, // boost strength
+   2, 0x18, 0x80, // enable internal temperature sensor
+   11, 0x37, 0x00, 0x00, 0xf8, 0x3f, 0x00, 0x40, 0x00, 0x00, 0x00, 0x01, // display options
+   5, 0x44, 0x00, 0x00, 0xbf, 0x03, // x range: 0 to 959
+   5, 0x45, 0x00, 0x00, 0xa7, 0x02, // y range: 0 to 679
+   3, 0x4e, 0x00, 0x00, // x addr start
+   3, 0x4f, 0x00, 0x00, // y addr start
+   BUSY_WAIT,
+   0
+};
+
+const uint8_t ep133_init_partial[] PROGMEM =
+{
+    0x02, 0x11, 0x03,
+    0x05, 0x44, 0x00, 0x00, 0xbf, 0x03,
+    0x05, 0x45, 0x00, 0x00, 0xa7, 0x02,
+    0x02, 0x3c, 0x01, // border waveform
+    0x03, 0x4e, 0x00, 0x00,
+    0x03, 0x4f, 0x00, 0x00,
+    0
+};
 
 const uint8_t epd31_init_full[] PROGMEM =
 {
@@ -3025,6 +3057,7 @@ const EPD_PANEL panelDefs[] PROGMEM = {
     {680, 480, 0, epd1085_init_full, NULL, NULL, 0, BBEP_CHIP_UC81xx, u8Colors_2clr}, // EP1085_1360x480
     {240, 320, 0, epd31_init_full, epd31_init_fast, epd31_init_part, 0, BBEP_CHIP_UC81xx, u8Colors_2clr}, // EP31_240x320
     {800, 480, 0, epd75yr_init_full, NULL, NULL, BBEP_NEEDS_EXTRA_INIT | BBEP_4COLOR, BBEP_CHIP_UC81xx, u8Colors_4clr_v2}, // EP75YR_800x480
+    {960, 680, 0, ep133_init, NULL, ep133_init_partial, 0, BBEP_CHIP_SSD16xx, u8Colors_2clr}, // EP133_960x680 GDEM133T91 13.3" B/W (SSD1677)
 };
 //
 // Set the e-paper panel type
@@ -3261,8 +3294,8 @@ void bbepSetAddrWindow(BBEPDISP *pBBEP, int x, int y, int cx, int cy)
         //        bbepCMD2(pBBEP, SSD1608_DATA_MODE, 0x3);
         bbepWriteCmd(pBBEP, SSD1608_SET_RAMXPOS);
         tx += pBBEP->x_offset;
-        if (pBBEP->type == EP7_960x640 || pBBEP->type == EP426_800x480 || pBBEP->type == EP426_800x480_4GRAY) { // pixels, not bytes version
-            if (pBBEP->type == EP7_960x640) {
+        if (pBBEP->type == EP7_960x640 || pBBEP->type == EP133_960x680 || pBBEP->type == EP426_800x480 || pBBEP->type == EP426_800x480_4GRAY) { // pixels, not bytes version
+            if (pBBEP->type == EP7_960x640 || pBBEP->type == EP133_960x680) {
                 tx <<= 3;
             }
             uc[0] = (tx & 0xff);
